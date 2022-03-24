@@ -35,10 +35,13 @@ export default function BeverageModal() {
                 </Modal.Header>
                 <Modal.Body>
                     <div className='p-3'>
-                        <div className='pb-3'>
-                            <h2>Instrucciones</h2>
-                            {prescription.strInstructions}
-                        </div>
+                        {prescription.strInstructions && (
+                            <div className='pb-3'>
+                                <h2>Instrucciones</h2>
+                                {prescription.strInstructions}
+                            </div>
+                        )}
+
                         <h2>Ingredientes y Cantidad</h2>
                         {showIngredients()}
                     </div>

@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from 'react'
 import axios from 'axios'
+import { translateToSpanish } from '../utils'
 
 const BeverageContext = createContext()
 
@@ -10,6 +11,28 @@ const BeverageProvider = ({ children }) => {
     const [prescription, setPrescription] = useState({})
     const [loading, setLoading] = useState(false)
 
+    const translatePrescription = async prescription => {
+        prescription.strInstructions = await translateToSpanish(
+            prescription.strInstructions
+        )
+
+        for (let i = 1; i <= 15; i++) {
+            if (prescription[`strIngredient${i}`]) {
+                prescription[`strIngredient${i}`] = await translateToSpanish(
+                    prescription[`strIngredient${i}`]
+                )
+            }
+            if (prescription[`strMeasure${i}`]) {
+                prescription[`strMeasure${i}`] = await translateToSpanish(
+                    prescription[`strMeasure${i}`]
+                )
+            }
+        }
+
+        setPrescription(prescription)
+        setLoading(false)
+    }
+
     useEffect(() => {
         setLoading(true)
         const getPrescription = async () => {
@@ -19,14 +42,12 @@ const BeverageProvider = ({ children }) => {
                 const url = `https://www.thecocktaildb.com/api/json/v1/1/lookup.php?i=${beverageId}`
 
                 const { data } = await axios(url)
-                setPrescription(data.drinks[0])
+                translatePrescription(data.drinks[0])
             } catch (error) {
                 console.log(error)
-            } finally {
                 setLoading(false)
             }
         }
-
         getPrescription()
     }, [beverageId])
 
